@@ -15,13 +15,17 @@ try:
                                        password='rooter')
     cursor = conn.cursor()
 #    cursor.execute("SELECT * FROM Categories")
-    cursor.execute("""select distinct c.CustomerID, c.CustFirstName, c.CustLastName
+    cursor.execute("""select Customers.CustomerID, Customers.CustFirstName, Customers.CustLastName
+from Customers
+where Customers.CustomerID not in (
+select distinct o.CustomerID
 from Order_Details od
 inner join Products p on od.ProductNumber = p.ProductNumber
 inner join Orders o on od.OrderNumber = o.OrderNumber
-right join Customers c on o.CustomerID = c.CustomerID
-where p.CategoryID not in (2, 6)
-or o.OrderNumber IS NULL;""")
+inner join Customers c on o.CustomerID = c.CustomerID
+inner join Categories cat on p.CategoryID = cat.CategoryID
+where cat.CategoryID in (2, 6)
+order by o.CustomerID);""")
     rows = cursor.fetchall()
 
     print('Question 2.1')
@@ -53,7 +57,7 @@ from Order_Details
 inner join Products on Order_Details.ProductNumber = Products.ProductNumber
 inner join Orders on Order_Details.OrderNumber = Orders.OrderNumber
 inner join Customers c2 on Orders.CustomerID = c2.CustomerID
-where Products.CategoryID = 1 and Products.ProductName like '%Helmet%'
+where Products.CategoryID = 1 and Products.ProductName like '%Helmet'
 and c.CustomerID = c2.CustomerID)
 order by c.CustomerID;""")
     rows = cursor.fetchall()
@@ -87,7 +91,7 @@ from Order_Details, Products, Categories
 where Order_Details.ProductNumber = Products.ProductNumber
 and Products.CategoryID = Categories.CategoryID
 and Categories.CategoryID = 1
-and ProductName like '%Helmet%')
+and ProductName like '%Helmet')
 order by OrderNumber;""")
     rows = cursor.fetchall()
 
@@ -122,7 +126,7 @@ inner join Products p on od.ProductNumber = p.ProductNumber
 inner join Orders o on od.OrderNumber = o.OrderNumber
 right join Customers c on o.CustomerID = c.CustomerID
 where p.CategoryID = 1
-and p.productname like '%Helmet%')
+and p.productname like '%Helmet')
 order by c.CustomerID, od.OrderNumber;""")
     rows = cursor.fetchall()
 
